@@ -1,0 +1,34 @@
+<html>
+
+   <head>
+   
+      <script type="text/javascript">
+         <!--
+            function sayHello() {
+				var xhr = new XMLHttpRequest();
+				//document.getElementById("searchTxt").value;
+				//xhr.open('GET', "http://10.33.1.16/msg?msg=works", false);
+				var ip = document.getElementById("ip").value;
+				var message = document.getElementById("msg").value
+				xhr.open('GET', "http://" + ip + "/msg?msg=" + message , false);
+				xhr.send( null );
+				console.log("request sent");
+				if(xhr.readyState == 4 && xhr.status == 200){
+					console.log("response received");
+					console.log(xhr.responseText);
+					alert(xhr.responseText);
+				}
+               //alert("Hello World")
+            }
+         //-->
+      </script>
+      
+   </head>
+   
+   <body>
+		ip : <input type="text" id="ip"/> 
+		message : <input type="text" id="msg"/> 
+		<input type="button" onclick="sayHello()" value="Go" />
+   </body>
+   
+</html>
