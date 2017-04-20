@@ -10,21 +10,43 @@
 ESP8266WebServer server(80);
 const char *ssid = "iot_capteur";
 
-String value = "No move detected.";
-String metaRefresh = "<meta http-equiv='refresh' content='0.1'>";
-
 /*****WebPage*****/
 // Warning: only use simple quotes in the html (no double)
+
+String link = "<iframe width='560' height='315' src='https://www.youtube.com/embed/0g1CaKuVEhc?autoplay=1' frameborder='0' allowfullscreen></iframe>";
+
 String rootHTML = "\
-<!doctype html> \
-<html> \
-<head>" + metaRefresh + " \
-<title> IoT into </title> \
-</head> \
-<body>\
-<br> "+ value+"\
-</body> </html>\
-";
+<!doctype html> \n\
+<html>\n\
+   <head>\n\
+      <script type='text/javascript' src='https://code.jquery.com/jquery-3.2.1.min.js'></script>\n\
+      <script type='text/javascript'>\n\
+            function listen(time = 1000) { \n\
+              setTimeout(function(){ \n\
+              var xhr = new XMLHttpRequest();\n\
+              xhr.open('GET', 'http://10.33.2.35/msg?msg=' + 'nothing' , false);\n\
+              xhr.send( null );\n\
+              console.log('request sent');\n\
+              if(xhr.readyState == 4 && xhr.status == 200){\n\
+                console.log('listening');\n\
+                if(xhr.responseText !== 'nothing') {\n\
+                  $('#link').html(`" + link + "`);\n\
+                  listen(5000); \n\
+                } else {\n\
+                  listen(1000); \n\
+                }\n\
+              } else {\n\
+                listen(1000);\n\
+              }\n\
+             }, time); \n\
+            }\n\
+      </script>\n\
+   </head>\n\
+   <body onLoad='listen(1000)'>\n\
+      <span id='link'></span> \n\
+   </body>\n\
+</html>";
+
 int calibrationTime = 30;  
  
 int ledPin = LED_BUILTIN;                // choose the pin for the LED
@@ -95,6 +117,7 @@ void setup() {
     setupWifi();
     setupServer();
     setupMDNS();
+  server.begin();
 }
 
 /****Loop****/
@@ -102,23 +125,14 @@ void loop() {
   server.handleClient();
   val = digitalRead(inputPin);  // read input value
   if(val == HIGH) {
-    metaRefresh = ""; // <meta http-equiv='refresh' content='10'>";
-    value = "Move detected.";
     Serial.println(val);
     digitalWrite(ledPin, LOW);
     digitalWrite(ledPin2, HIGH);
-    /*String answer = getHTML();
-    answer.replace("No", "light on");
-    server.send(200, "text/html", answer);*/
-    // delay(10000);
+    String message = "capteur on";
+    server.send(200, "text/html", " Received : "+ message);
   } else {
-    metaRefresh = "<meta http-equiv='refresh' content='0.1'>";
-    value = "No move detected.";
     digitalWrite(ledPin, HIGH);
     digitalWrite(ledPin2, LOW);
-    /*String answer = getHTML();
-    answer.replace("No", "light off");
-    server.send(200, "text/html", answer);*/
   }
 }
 
