@@ -5,6 +5,7 @@
 #include <ESP8266WebServer.h>     //Local WebServer used to serve the configuration portal
 #include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <ESP8266mDNS.h>          //Allow custom URL
+#include "FS.h"
 
 /*****Initialization*****/
 ESP8266WebServer server(80);
@@ -13,9 +14,12 @@ const char *ssid = "iot_capteur";
 /*****WebPage*****/
 // Warning: only use simple quotes in the html (no double)
 
-String link = "<iframe width='560' height='315' src='https://www.youtube.com/embed/0g1CaKuVEhc?autoplay=1' frameborder='0' allowfullscreen></iframe>";
+String linkP1 = "<iframe width='560' height='315' src='";
+String linkP2 = "?autoplay=1' frameborder='0' allowfullscreen></iframe>";
+String linkAudioP1 = "<audio controls autoplay> <source src=";
+String linkAudioP2 = " type='audio/mpeg'> Your browser does not support the audio element.</audio>";
 
-String rootHTML = "\
+String rootHTMLP1 = "\
 <!doctype html> \n\
 <html>\n\
    <head>\n\
@@ -24,13 +28,15 @@ String rootHTML = "\
             function listen(time = 1000) { \n\
               setTimeout(function(){ \n\
               var xhr = new XMLHttpRequest();\n\
-              xhr.open('GET', 'http://10.33.2.35/msg?msg=' + 'nothing' , false);\n\
+              xhr.open('GET', 'http://' + window.location.hostname + '/msg?msg=' + 'nothing' , false);\n\
               xhr.send( null );\n\
               console.log('request sent');\n\
               if(xhr.readyState == 4 && xhr.status == 200){\n\
                 console.log('listening');\n\
                 if(xhr.responseText !== 'nothing') {\n\
-                  $('#link').html(`" + link + "`);\n\
+                  $('#link').html(`";
+                  
+String rootHTMLP2 = "`);\n\
                   listen(5000); \n\
                 } else {\n\
                   listen(1000); \n\
@@ -47,6 +53,56 @@ String rootHTML = "\
    </body>\n\
 </html>";
 
+String interfaceHTML = "\
+<html>\n\
+   <head>\n\
+      <script type='text/javascript'>\n\
+        function sayHello() {\n\
+          var xhr = new XMLHttpRequest();\n\
+          var message = document.getElementById('msg').value\n\
+          xhr.open('GET', 'http://' + window.location.hostname + '/setAudioUrl?url=' + message , false);\n\
+          xhr.send( null );\n\
+          console.log('request sent');\n\
+          if(xhr.readyState == 4 && xhr.status == 200){\n\
+            console.log('response received');\n\
+            console.log(xhr.responseText);\n\
+            alert('link changed');\n\
+          }\n\
+        }\n\
+      </script>\n\
+   </head>\n\
+   <body>\n\
+    new link : <input type='text' id='msg'/>\n\
+    <input type='button' onclick='sayHello()' value='Go' />\n\
+   </body>\n\
+</html>";
+
+
+
+String interfaceTypeHTML = "\
+<html>\n\
+   <head>\n\
+      <script type='text/javascript'>\n\
+        function sayHello() {\n\
+          var xhr = new XMLHttpRequest();\n\
+          var message = document.getElementById('msg').value\n\
+          xhr.open('GET', 'http://' + window.location.hostname + '/setAudioTypeUrl?url=' + message , false);\n\
+          xhr.send( null );\n\
+          console.log('request sent');\n\
+          if(xhr.readyState == 4 && xhr.status == 200){\n\
+            console.log('response received');\n\
+            console.log(xhr.responseText);\n\
+            alert('link changed');\n\
+          }\n\
+        }\n\
+      </script>\n\
+   </head>\n\
+   <body>\n\
+    type link : <input type='text' id='msg'/>\n\
+    <input type='button' onclick='sayHello()' value='Go' />\n\
+   </body>\n\
+</html>";
+
 int calibrationTime = 30;  
  
 int ledPin = LED_BUILTIN;                // choose the pin for the LED
@@ -56,14 +112,50 @@ int pirState = LOW;             // we start, assuming no motion detected
 int val = 0;                    // variable for reading the pin status
 
 String getHTML() {
-    String updatedRootHTML = rootHTML;
-    String voltage = String(analogRead(A0) * 3. / 1024.);
-    updatedRootHTML.replace("xxx", voltage);
+    String toLink = "https://www.youtube.com/embed/0g1CaKuVEhc";
+    File f = SPIFFS.open("/audiourl.txt", "r");
+    if (!f) {
+      Serial.println("file open failed");
+    } else {
+      String s = f.readStringUntil('\n');
+      if(s[0] != '\0') {
+        toLink = s;
+      }
+    }
+
+    char type = 'y';
+    File f2 = SPIFFS.open("/audiotypeurl.txt", "r");
+    if (!f2) {
+      Serial.println("file open failed");
+    } else {
+      char s2 = f2.readStringUntil('\n')[0];
+      Serial.println("-------------------------------------------");
+      Serial.println(s2);
+      if(s2 != '\0') {
+        type = s2;
+      }
+    }
+    
+    String updatedRootHTML = rootHTMLP1 + linkAudioP1 + toLink + linkAudioP2 + rootHTMLP2;
+      
+    if( type == 'y') {
+      updatedRootHTML = rootHTMLP1 + linkP1 + toLink + linkP2 + rootHTMLP2;
+      Serial.println("-------------------------------------------");
+      Serial.println("-------------------------------------------");
+    }
     return updatedRootHTML;
 }
 
 void handleRoot() {
     server.send(200, "text/html", getHTML());
+}
+
+void handleInterfaceRoot() {
+    server.send(200, "text/html", interfaceHTML);
+}
+
+void handleInterfaceTypeRoot() {
+    server.send(200, "text/html", interfaceTypeHTML);
 }
 
 /****Setups****/
@@ -86,6 +178,28 @@ void setupWifi() {
 
 void setupServer() {
     server.on("/", handleRoot);
+    server.on("/set", handleInterfaceRoot);
+    server.on("/setType", handleInterfaceTypeRoot);
+
+    server.on("/setAudioUrl", [](){
+      String myLink = server.arg("url");
+      File f = SPIFFS.open("/audiourl.txt", "w");
+      if (!f) {
+        Serial.println("file open failed");
+      }
+      f.println( myLink );
+      f.close();
+    });
+
+    server.on("/setAudioTypeUrl", [](){
+      String myLink = server.arg("url");
+      File f = SPIFFS.open("/audiotypeurl.txt", "w");
+      if (!f) {
+        Serial.println("file open failed");
+      }
+      f.println( myLink );
+      f.close();
+    });
     server.begin();
     Serial.println("HTTP server started");
 }
@@ -101,6 +215,7 @@ void setupMDNS() {
 }
 
 void setup() {
+  SPIFFS.begin();
   pinMode(ledPin, OUTPUT);      // declare LED as output
   pinMode(ledPin2, OUTPUT);      // declare LED as output
   pinMode(inputPin, INPUT);     // declare sensor as input
