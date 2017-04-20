@@ -1,13 +1,8 @@
 <html>
-
    <head>
-   
       <script type="text/javascript">
-         <!--
             function sayHello() {
 				var xhr = new XMLHttpRequest();
-				//document.getElementById("searchTxt").value;
-				//xhr.open('GET', "http://10.33.1.16/msg?msg=works", false);
 				var ip = document.getElementById("ip").value;
 				var message = document.getElementById("msg").value
 				xhr.open('GET', "http://" + ip + "/msg?msg=" + message , false);
@@ -17,20 +12,25 @@
 					console.log("response received");
 					console.log(xhr.responseText);
 					alert(xhr.responseText);
+				    
 				}
-               //alert("Hello World")
+				/*
+				document.getElementById("son").src += "";
+    			ev.preventDefault();
+            	*/
             }
-         //-->
       </script>
-      
    </head>
-   
    <body>
+   		<iframe id="son" src="https://www.youtube.com/embed/0g1CaKuVEhc?autoplay=1" allowfullscreen>
+			<p>Your browser does not support iframes.</p>
+		</iframe>
+		<br>
 		ip : <input type="text" id="ip"/> 
 		message : <input type="text" id="msg"/> 
+		<br>
 		<input type="button" onclick="sayHello()" value="Go" />
-		
-		<audio src="D:\IoT\beep.mp3" controls/>
+		<br>
+		<!--audio src="D:\IoT\beep.mp3" controls/-->
    </body>
-   
 </html>
