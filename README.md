@@ -3,7 +3,7 @@
 Arduino movement detector which play songs
 
 Presentation:
-https://docs.google.com/presentation/d/137jWZd6tapu6696X0hdtBjZBa9_8uMd9ih9CgkLRI2c/edit#slide=id.g21fa09b164_0_250
+https://docs.google.com/presentation/d/137jWZd6tapu6696X0hdtBjZBa9_8uMd9ih9CgkLRI2c/edit?usp=sharing
 
 ## Needed hardware
 - Weemos D1
