@@ -44,3 +44,5 @@ We made the project by following these steps :
   - Add an interface to load different songs of differents format 
 - Step 8:
   - Add a mailing function to warn when the trap is triggered
+  
+  https://image.noelshack.com/fichiers/2017/16/1492780973-plan.png
