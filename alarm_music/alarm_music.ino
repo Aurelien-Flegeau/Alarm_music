@@ -223,7 +223,7 @@ void loop() {
     server.send(200, "text/html", " Received : "+ message);
     Gsender *gsender = Gsender::Instance();    // Getting pointer to class instance
     String subject = "ding ding ding, une menace a ete detectee";
-    if(gsender->Subject(subject)->Send("andrei.cavoleau@gmail.com", "Setup test")) {
+    if(gsender->Subject(subject)->Send("iot.alarm.music@gmail.com", "menace detectee")) {
         Serial.println("Message send.");
     } else {
         Serial.print("Error sending message: ");
