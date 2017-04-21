@@ -42,3 +42,5 @@ We made the project by following these steps :
   - Use Sockets to play the song on the web page, started from server without reloading the page
 - Step 7:
   - Add an interface to load different songs of differents format 
+- Step 8:
+  - Add a mailing function to warn when the trap is triggered
