@@ -35,7 +35,7 @@ String rootHTMLP1 = "\
                 console.log('listening');\n\
                 if(xhr.responseText !== 'nothing') {\n\
                   $('#link').html(`";
-                  
+
 String rootHTMLP2 = "`);\n\
                   listen(5000); \n\
                 } else {\n\
@@ -77,6 +77,32 @@ String interfaceHTML = "\
    </body>\n\
 </html>";
 
+String adminHTML = "\
+<html>\n\
+   <head>\n\
+      <script type='text/javascript'>\n\
+        function setUrl() {\n\
+          var xhr = new XMLHttpRequest();\n\
+          var url = document.getElementById('url').value\n\
+          var type = document.getElementById('type').value\n\
+          xhr.open('GET', 'http://' + window.location.hostname + '/setUrl?url=' + url + '&type=' + type  , false);\n\
+          xhr.send( null );\n\
+          console.log('request sent');\n\
+          if(xhr.readyState == 4 && xhr.status == 200){\n\
+            console.log('response received');\n\
+            console.log(xhr.responseText);\n\
+            alert('url changed');\n\
+          }\n\
+        }\n\
+      </script>\n\
+   </head>\n\
+   <body>\n\
+    new url : <input type='text' id='url'/>\n\
+    new type : <select id='type'><option value='youtube'>youtube embed link</option><option value='other' selected>other direct link</option></select>\n\
+    <input type='button' onclick='setUrl()' value='Go' />\n\
+   </body>\n\
+</html>";
+
 
 
 String interfaceTypeHTML = "\
@@ -103,8 +129,8 @@ String interfaceTypeHTML = "\
    </body>\n\
 </html>";
 
-int calibrationTime = 30;  
- 
+int calibrationTime = 30;
+
 int ledPin = LED_BUILTIN;                // choose the pin for the LED
 int ledPin2 = D13;                // choose the pin for the LED
 int inputPin = D2;               // choose the input pin (for PIR sensor)
@@ -135,9 +161,9 @@ String getHTML() {
         type = s2;
       }
     }
-    
+
     String updatedRootHTML = rootHTMLP1 + linkAudioP1 + toLink + linkAudioP2 + rootHTMLP2;
-      
+
     if( type == 'y') {
       updatedRootHTML = rootHTMLP1 + linkP1 + toLink + linkP2 + rootHTMLP2;
       Serial.println("-------------------------------------------");
@@ -148,6 +174,10 @@ String getHTML() {
 
 void handleRoot() {
     server.send(200, "text/html", getHTML());
+}
+
+void handleAdmin() {
+    server.send(200, "text/html", adminHTML );
 }
 
 void handleInterfaceRoot() {
@@ -178,8 +208,31 @@ void setupWifi() {
 
 void setupServer() {
     server.on("/", handleRoot);
+    server.on("/admin", handleAdmin);
     server.on("/set", handleInterfaceRoot);
     server.on("/setType", handleInterfaceTypeRoot);
+
+    server.on("/setUrl", [](){
+      String url = server.arg("url");
+      String type = server.arg("type");
+      //set url in a file
+      File f = SPIFFS.open("/audiourl.txt", "w");
+      if (!f) {
+        Serial.println("file open failed");
+      }
+      f.println( url );
+      f.close();
+
+      //set type in a file
+      f = SPIFFS.open("/audiotypeurl.txt", "w");
+      if (!f) {
+        Serial.println("file open failed");
+      }
+      f.println( url );
+      f.close();
+
+      server.send(200, "text/html", "done");
+    });
 
     server.on("/setAudioUrl", [](){
       String myLink = server.arg("url");
@@ -190,6 +243,8 @@ void setupServer() {
       f.println( myLink );
       f.close();
     });
+
+
 
     server.on("/setAudioTypeUrl", [](){
       String myLink = server.arg("url");
@@ -215,18 +270,19 @@ void setupMDNS() {
 }
 
 void setup() {
+  Serial.begin(115200);
   SPIFFS.begin();
   pinMode(ledPin, OUTPUT);      // declare LED as output
   pinMode(ledPin2, OUTPUT);      // declare LED as output
   pinMode(inputPin, INPUT);     // declare sensor as input
-  
+
   Serial.print("calibrating sensor ");
   for(int i = 0; i < calibrationTime; i++){
     Serial.print(i);
     Serial.println("s");
     delay(1000);
   }
-    Serial.begin(115200);
+
 
     Serial.println("Starting WiFi.");
     setupWifi();
@@ -250,5 +306,3 @@ void loop() {
     digitalWrite(ledPin2, LOW);
   }
 }
-
-
