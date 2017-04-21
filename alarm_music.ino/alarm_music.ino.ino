@@ -53,30 +53,7 @@ String rootHTMLP2 = "`);\n\
    </body>\n\
 </html>";
 
-String interfaceHTML = "\
-<html>\n\
-   <head>\n\
-      <script type='text/javascript'>\n\
-        function sayHello() {\n\
-          var xhr = new XMLHttpRequest();\n\
-          var message = document.getElementById('msg').value\n\
-          xhr.open('GET', 'http://' + window.location.hostname + '/setAudioUrl?url=' + message , false);\n\
-          xhr.send( null );\n\
-          console.log('request sent');\n\
-          if(xhr.readyState == 4 && xhr.status == 200){\n\
-            console.log('response received');\n\
-            console.log(xhr.responseText);\n\
-            alert('link changed');\n\
-          }\n\
-        }\n\
-      </script>\n\
-   </head>\n\
-   <body>\n\
-    new link : <input type='text' id='msg'/>\n\
-    <input type='button' onclick='sayHello()' value='Go' />\n\
-   </body>\n\
-</html>";
-
+// Administration page Web
 String adminHTML = "\
 <html>\n\
    <head>\n\
@@ -98,34 +75,8 @@ String adminHTML = "\
    </head>\n\
    <body>\n\
     new url : <input type='text' id='url'/>\n\
-    new type : <select id='type'><option value='youtube'>youtube embed link</option><option value='other' selected>other direct link</option></select>\n\
+    new type : <select id='type'><option value='y'>youtube embed link</option><option value='other' selected>other direct link</option></select>\n\
     <input type='button' onclick='setUrl()' value='Go' />\n\
-   </body>\n\
-</html>";
-
-
-
-String interfaceTypeHTML = "\
-<html>\n\
-   <head>\n\
-      <script type='text/javascript'>\n\
-        function sayHello() {\n\
-          var xhr = new XMLHttpRequest();\n\
-          var message = document.getElementById('msg').value\n\
-          xhr.open('GET', 'http://' + window.location.hostname + '/setAudioTypeUrl?url=' + message , false);\n\
-          xhr.send( null );\n\
-          console.log('request sent');\n\
-          if(xhr.readyState == 4 && xhr.status == 200){\n\
-            console.log('response received');\n\
-            console.log(xhr.responseText);\n\
-            alert('link changed');\n\
-          }\n\
-        }\n\
-      </script>\n\
-   </head>\n\
-   <body>\n\
-    type link : <input type='text' id='msg'/>\n\
-    <input type='button' onclick='sayHello()' value='Go' />\n\
    </body>\n\
 </html>";
 
@@ -180,14 +131,6 @@ void handleAdmin() {
     server.send(200, "text/html", adminHTML );
 }
 
-void handleInterfaceRoot() {
-    server.send(200, "text/html", interfaceHTML);
-}
-
-void handleInterfaceTypeRoot() {
-    server.send(200, "text/html", interfaceTypeHTML);
-}
-
 /****Setups****/
 void setupWifi() {
     //WiFiManager
@@ -209,8 +152,6 @@ void setupWifi() {
 void setupServer() {
     server.on("/", handleRoot);
     server.on("/admin", handleAdmin);
-    server.on("/set", handleInterfaceRoot);
-    server.on("/setType", handleInterfaceTypeRoot);
 
     server.on("/setUrl", [](){
       String url = server.arg("url");
@@ -228,32 +169,10 @@ void setupServer() {
       if (!f) {
         Serial.println("file open failed");
       }
-      f.println( url );
+      f.println( type );
       f.close();
 
       server.send(200, "text/html", "done");
-    });
-
-    server.on("/setAudioUrl", [](){
-      String myLink = server.arg("url");
-      File f = SPIFFS.open("/audiourl.txt", "w");
-      if (!f) {
-        Serial.println("file open failed");
-      }
-      f.println( myLink );
-      f.close();
-    });
-
-
-
-    server.on("/setAudioTypeUrl", [](){
-      String myLink = server.arg("url");
-      File f = SPIFFS.open("/audiotypeurl.txt", "w");
-      if (!f) {
-        Serial.println("file open failed");
-      }
-      f.println( myLink );
-      f.close();
     });
     server.begin();
     Serial.println("HTTP server started");
