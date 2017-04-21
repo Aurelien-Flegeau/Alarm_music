@@ -221,14 +221,6 @@ void loop() {
     digitalWrite(ledPin2, HIGH);
     String message = "capteur on";
     server.send(200, "text/html", " Received : "+ message);
-    Gsender *gsender = Gsender::Instance();    // Getting pointer to class instance
-    String subject = "ding ding ding, une menace a ete detectee";
-    if(gsender->Subject(subject)->Send("iot.alarm.music@gmail.com", "menace detectee")) {
-        Serial.println("Message send.");
-    } else {
-        Serial.print("Error sending message: ");
-        Serial.println(gsender->getError());
-    }
   } else {
     digitalWrite(ledPin, HIGH);
     digitalWrite(ledPin2, LOW);
