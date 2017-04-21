@@ -6,6 +6,7 @@
 #include <WiFiManager.h>          //https://github.com/tzapu/WiFiManager WiFi Configuration Magic
 #include <ESP8266mDNS.h>          //Allow custom URL
 #include "FS.h"
+#include "Gsender.h"
 
 /*****Initialization*****/
 ESP8266WebServer server(80);
@@ -220,6 +221,14 @@ void loop() {
     digitalWrite(ledPin2, HIGH);
     String message = "capteur on";
     server.send(200, "text/html", " Received : "+ message);
+    Gsender *gsender = Gsender::Instance();    // Getting pointer to class instance
+    String subject = "ding ding ding, une menace a ete detectee";
+    if(gsender->Subject(subject)->Send("andrei.cavoleau@gmail.com", "Setup test")) {
+        Serial.println("Message send.");
+    } else {
+        Serial.print("Error sending message: ");
+        Serial.println(gsender->getError());
+    }
   } else {
     digitalWrite(ledPin, HIGH);
     digitalWrite(ledPin2, LOW);
