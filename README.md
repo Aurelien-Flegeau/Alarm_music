@@ -3,7 +3,7 @@
 Arduino movement detector which play songs
 
 Presentation:
-
+https://docs.google.com/presentation/d/137jWZd6tapu6696X0hdtBjZBa9_8uMd9ih9CgkLRI2c/edit?usp=sharing
 
 ## Needed hardware
 - Weemos D1
@@ -13,13 +13,13 @@ Presentation:
 
 ## Installation notes
 
-The wifi code is based of this github repository so, you will need to follow their instructions:
-- https://github.com/honnet/iot_intro/wiki/IOT-Intro
-
 The PIR motion sensor code is based of this tutorial, you will need to follow their instrutcions:
 - http://www.manuel-esteban.com/tuto-lire-un-capteur-infrarouge-avec-arduino/
 
-How to make a server on an ESP8266 :
+Manual of PIR motion sensor:
+- https://www.mpja.com/download/31227sc.pdf
+
+How to make a server on an ESP8266:
 - https://www.fais-le-toi-meme.fr/fr/electronique/tutoriel/programmes-arduino-executes-sur-esp8266-arduino-ide
 
 ## Steps followed
