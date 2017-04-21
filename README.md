@@ -5,6 +5,9 @@ Arduino movement detector which play songs
 Presentation:
 https://docs.google.com/presentation/d/137jWZd6tapu6696X0hdtBjZBa9_8uMd9ih9CgkLRI2c/edit?usp=sharing
 
+state of the art:
+https://docs.google.com/document/d/1WblYoKvYsVU3uSCl9s2EiusWHYPhPOMS6-9A7LZ6wk0/edit?usp=drive_web
+
 ## Needed hardware
 - Weemos D1
 - RED LED
@@ -21,6 +24,33 @@ Manual of PIR motion sensor:
 
 How to make a server on an ESP8266:
 - https://www.fais-le-toi-meme.fr/fr/electronique/tutoriel/programmes-arduino-executes-sur-esp8266-arduino-ide
+
+## Distribution task
+
+ - day 1
+Andreï - displaying message in morse language using the internal LED
+Aurélien, Andreï, Kévin, Sébastien - Choose the subject
+Aurélien - buy a Wemos D1
+
+ - day 2
+Kévin, Sebastien, Andreï - State of the art of the similar projects
+Aurelien, Andrei - Use and configure a PIR motion sensor
+Sebastien, Kevin - POC websocket server
+
+ - day 3 
+Andreï - POC filesystem :transfering files from the computer in the ESP8266 using a plugin for Arduino IDE (https://github.com/esp8266/arduino-esp8266fs-plugin), writing and reading files in the ESP8266 file system
+Aurelien - create a web interface which listens to the server and trigger a video/audio when the alarm goes off
+Aurélien & Andreï - adding the file writing and reading to the main project in order to keep the configuration saved even after a reset
+Kévin, Sébastien - POC reading audio from the webpage
+Kévin, Sébastien - documentation start
+
+ - day 4
+Andreï - refactoring and creation of an admin page + server API to change the url link and type of the audio
+Aurélien & Andreï -adding the admin page in the project
+Andreï - POC of the mail sender using an D1 mini using the library GSender and following this tutorial : http://www.instructables.com/id/ESP8266-GMail-Sender/
+Aurélien & Andreï - adding themail sending code in the project
+Kévin, Sebastien, Aurelien - Readme and power point
+Andreï - task list and distribution
 
 ## Steps followed
 We made the project by following these steps :
